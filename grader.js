@@ -49,6 +49,8 @@ var loadChecks = function(checksfile) {
 };
 
 var checkHtmlFile = function(htmlfile, checksfile) {
+	console.error('Check local: ' + htmlfile);
+
     $ = cheerioHtmlFile(htmlfile);
     var checks = loadChecks(checksfile).sort();
     var out = {};
@@ -69,29 +71,26 @@ var buildfn = function(checksfile) {
             console.error('Error: ' + util.format(result.message));
         } else {
         	// process result
-        	console.log(response)
+
+		    $ = cheerio.load(result);
 
 		    var checks = loadChecks(checksfile).sort();
-        	/*
-		    $ = cheerioHtmlFile(htmlfile);
-
 		    var out = {};
 		    for(var ii in checks) {
 		        var present = $(checks[ii]).length > 0;
 		        out[checks[ii]] = present;
 		    }
-		    return out;
 
-			var outJson = JSON.stringify(out, null, 4);
-			console.log(outJson); */
-        }
+		    var outJson = JSON.stringify(out, null, 4);
+		    console.log(outJson);
+		}
     };
     return check;
 };
 
 var checkURL = function(url, checksfile) {
 	var check = buildfn(checksfile);
-	console.log(url);
+	console.error('Check remote: ' + url);
 	rest.get(url).on('complete', check);
 };
 
@@ -118,10 +117,10 @@ if(require.main == module) {
 }
 
 
-// TODO: pass buffer to cheerio, rather than file
-
 // TODO: have a URL check for command-line?
-// TODO: ensure only file or URL is passed (or have a priority - maybe file takes precedence) OR even allow both -> multiples
-// TODO: download URL if passed - maybe into file, or maybe into buffer
 // TODO: use file or url, not hard-coded to use URL
+// TODO: ensure only file or URL is passed (or have a priority - maybe file takes precedence) OR even allow both -> multiples
+
 // TODO: refactor to use common checking
+
+// TODO: consider other implementations, e.g. use a new cheerioURL() to synchrononously fetch file (perhaps with request module) and build DOM, removing need for callback
