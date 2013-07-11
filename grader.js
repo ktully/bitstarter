@@ -24,6 +24,9 @@ References:
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
+var util = require('util');
+var rest = require('restler');
+
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
 var URL_DEFAULT = "http://damp-castle-5384.herokuapp.com";
@@ -53,8 +56,45 @@ var checkHtmlFile = function(htmlfile, checksfile) {
         var present = $(checks[ii]).length > 0;
         out[checks[ii]] = present;
     }
-    return out;
+
+    var outJson = JSON.stringify(out, null, 4);
+    console.log(outJson);
 };
+
+
+// ktully: build event handler for REST API response
+var buildfn = function(checksfile) {
+    var check = function(result, response) {
+        if (result instanceof Error) {
+            console.error('Error: ' + util.format(response.message));
+        } else {
+        	// process result
+        	console.log(rseponse)
+
+		    var checks = loadChecks(checksfile).sort();
+        	/*
+		    $ = cheerioHtmlFile(htmlfile);
+
+		    var out = {};
+		    for(var ii in checks) {
+		        var present = $(checks[ii]).length > 0;
+		        out[checks[ii]] = present;
+		    }
+		    return out;
+
+			var outJson = JSON.stringify(out, null, 4);
+			console.log(outJson); */
+        }
+    };
+    return check;
+};
+
+var checkURL = function(url, checksfile) {
+	var check = buildfn(checksfile);
+	rest.get(url).on('complete', check);
+};
+
+
 
 var clone = function(fn) {
     // Workaround for commander.js issue.
@@ -66,11 +106,22 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-        .option('-u, --url <url>', 'URL to check instead of local file', clone(assertFileExists), URL_DEFAULT)
+        .option('-u, --url <url>', 'URL to check instead of local file', true, URL_DEFAULT)
         .parse(process.argv);
-    var checkJson = checkHtmlFile(program.file, program.checks);
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
+
+    //checkHtmlFile(program.file, program.checks);
+	checkURL(program.file, program.checks);
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
+
+// TODO: get rest to download url into buffer
+
+// TODO: pass buffer to cheerio, rather than file
+
+// TODO: have a URL check for command-line?
+// TODO: ensure only file or URL is passed (or have a priority - maybe file takes precedence) OR even allow both -> multiples
+// TODO: download URL if passed - maybe into file, or maybe into buffer
+// TODO: use file or url, not hard-coded to use URL
+// TODO: refactor to use common checking
+
