@@ -29,7 +29,7 @@ var rest = require('restler');
 
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
-var URL_DEFAULT = "http://damp-castle-5384.herokuapp.com/";
+//var URL_DEFAULT = "http://damp-castle-5384.herokuapp.com/";
 
 var assertFileExists = function(infile) {
     var instr = infile.toString();
@@ -106,21 +106,16 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-        .option('-u, --url <url>', 'URL to check instead of local file', URL_DEFAULT)
+        .option('-u, --url <url>', 'URL to check instead of local file')
         .parse(process.argv);
 
-    //checkHtmlFile(program.file, program.checks);
-	checkURL(program.url, program.checks);
+    if (program.url) checkURL(program.url, program.checks);
+    else checkHtmlFile(program.file, program.checks);
 } else {
     exports.checkHtmlFile = checkHtmlFile;
     exports.checkURL = checkURL;
 }
 
-
-// TODO: have a URL check for command-line?
-// TODO: use file or url, not hard-coded to use URL
-// TODO: ensure only file or URL is passed (or have a priority - maybe file takes precedence) OR even allow both -> multiples
-
 // TODO: refactor to use common checking
-
+// TODO: ensure only file or URL is passed (or have a priority - maybe file takes precedence) OR even allow both -> list of things to check
 // TODO: consider other implementations, e.g. use a new cheerioURL() to synchrononously fetch file (perhaps with request module) and build DOM, removing need for callback
