@@ -29,7 +29,7 @@ var rest = require('restler');
 
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
-var URL_DEFAULT = "http://damp-castle-5384.herokuapp.com";
+var URL_DEFAULT = "http://damp-castle-5384.herokuapp.com/";
 
 var assertFileExists = function(infile) {
     var instr = infile.toString();
@@ -69,7 +69,7 @@ var buildfn = function(checksfile) {
             console.error('Error: ' + util.format(result.message));
         } else {
         	// process result
-        	console.log(rseponse)
+        	console.log(response)
 
 		    var checks = loadChecks(checksfile).sort();
         	/*
@@ -91,6 +91,7 @@ var buildfn = function(checksfile) {
 
 var checkURL = function(url, checksfile) {
 	var check = buildfn(checksfile);
+	console.log(url);
 	rest.get(url).on('complete', check);
 };
 
@@ -106,17 +107,16 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-        .option('-u, --url <url>', 'URL to check instead of local file', true, URL_DEFAULT)
+        .option('-u, --url <url>', 'URL to check instead of local file', URL_DEFAULT)
         .parse(process.argv);
 
     //checkHtmlFile(program.file, program.checks);
-	checkURL(program.file, program.checks);
+	checkURL(program.url, program.checks);
 } else {
     exports.checkHtmlFile = checkHtmlFile;
     exports.checkURL = checkURL;
 }
 
-// TODO: get rest to download url into buffer
 
 // TODO: pass buffer to cheerio, rather than file
 
