@@ -66,7 +66,7 @@ var checkHtmlFile = function(htmlfile, checksfile) {
 var buildfn = function(checksfile) {
     var check = function(result, response) {
         if (result instanceof Error) {
-            console.error('Error: ' + util.format(response.message));
+            console.error('Error: ' + util.format(result.message));
         } else {
         	// process result
         	console.log(rseponse)
@@ -113,6 +113,7 @@ if(require.main == module) {
 	checkURL(program.file, program.checks);
 } else {
     exports.checkHtmlFile = checkHtmlFile;
+    exports.checkURL = checkURL;
 }
 
 // TODO: get rest to download url into buffer
@@ -124,4 +125,3 @@ if(require.main == module) {
 // TODO: download URL if passed - maybe into file, or maybe into buffer
 // TODO: use file or url, not hard-coded to use URL
 // TODO: refactor to use common checking
-
